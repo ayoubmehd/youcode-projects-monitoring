@@ -1,30 +1,30 @@
---DROP ALL CONSTRAINTS
-ALTER TABLE projects
+/*DROP ALL CONSTRAINTS*/
+ALTER TABLE IF EXISTS projects
 DROP CONSTRAINT IF EXISTS fk_projects_organisation;
 
-ALTER TABLE projects 
+ALTER TABLE IF EXISTS projects 
 DROP CONSTRAINT IF EXISTS fk_projects_manager;
 
-ALTER TABLE documents 
+ALTER TABLE IF EXISTS documents 
 DROP CONSTRAINT IF EXISTS fk_documents_project;
 
-ALTER TABLE phases 
+ALTER TABLE IF EXISTS phases 
 DROP CONSTRAINT IF EXISTS fk_phases_project;
 
-ALTER TABLE deliverables 
+ALTER TABLE IF EXISTS deliverables 
 DROP CONSTRAINT IF EXISTS fk_deliverables_phase;
 
-ALTER TABLE employees 
+ALTER TABLE IF EXISTS employees 
 DROP CONSTRAINT IF EXISTS fk_employees_profile;
 
-ALTER TABLE project_employee 
-DROP CONSTRAINT IF EXISTS fk_project_employees_project;
+ALTER TABLE IF EXISTS phase_employee 
+DROP CONSTRAINT IF EXISTS fk_phase_employees_project;
 
-ALTER TABLE project_employee 
-DROP CONSTRAINT IF EXISTS fk_project_employees_employee;
+ALTER TABLE IF EXISTS phase_employee 
+DROP CONSTRAINT IF EXISTS fk_phase_employees_employee;
 
 -- DROP ALL TABLES
-DROP TABLE IF EXISTS project_employee;
+DROP TABLE IF EXISTS phase_employee;
 DROP TABLE IF EXISTS documents;
 DROP TABLE IF EXISTS phases;
 DROP TABLE IF EXISTS deliverables;
@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS organisations;
 DROP TABLE IF EXISTS employees;
 DROP TABLE IF EXISTS profiles;
 DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS states;
 
 
 -- CREATING TABLES
@@ -69,6 +70,12 @@ CREATE TABLE IF NOT EXISTS phases (
     is_payed BOOLEAN,
     project_code BIGINT,
     PRIMARY KEY (code)
+);
+
+CREATE TABLE IF NOT EXISTS states (
+    id BIGINT,
+    label VARCHAR(100),
+    PRIMARY KEY (id)
 );
 
 
@@ -113,13 +120,13 @@ CREATE TABLE IF NOT EXISTS profiles (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS project_employee (
-    project_code BIGINT,
+CREATE TABLE IF NOT EXISTS phase_employee (
+    phase_code BIGINT,
     employee_code BIGINT,
-    PRIMARY KEY (project_code, employee_code)
+    PRIMARY KEY (phase_code, employee_code)
 );
 
--- CREATE CONSTRAINTS
+-- CREATE FK CONSTRAINTS
 ALTER TABLE projects 
 ADD CONSTRAINT fk_projects_organisation
 FOREIGN KEY (organisation_code)
@@ -150,13 +157,13 @@ ADD CONSTRAINT fk_employees_profile
 FOREIGN KEY (profile_id)
 REFERENCES profiles(id);
 
-ALTER TABLE project_employee 
-ADD CONSTRAINT fk_project_employees_project
-FOREIGN KEY (project_code)
-REFERENCES projects(code);
+ALTER TABLE phase_employee 
+ADD CONSTRAINT fk_phase_employees_project
+FOREIGN KEY (phase_code)
+REFERENCES phases(code);
 
-ALTER TABLE project_employee 
-ADD CONSTRAINT fk_project_employees_employee
+ALTER TABLE phase_employee 
+ADD CONSTRAINT fk_phase_employees_employee
 FOREIGN KEY (employee_code)
 REFERENCES employees(registration_number);
 
